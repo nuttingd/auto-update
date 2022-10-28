@@ -1,5 +1,5 @@
-name: Auto-update
-author: Thibault Derousseaux <tibdex@gmail.com>
+name: auto-update-with-label
+author: David Nutting (david@nutting.dev)
 description: Automatically keep pull requests with auto-merged enabled up to date with their base branch.
 inputs:
   token:
