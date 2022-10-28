@@ -93,7 +93,12 @@ const handlePullRequest = async (
     octokit: InstanceType<typeof GitHub>;
   }>,
 ): Promise<void> => {
-  if (matchLabel && !pullRequest.labels.some((label: { name: string; }) => label.name === matchLabel)){
+  if (
+    matchLabel &&
+    !pullRequest.labels.some(
+      (label: { name: string }) => label.name === matchLabel,
+    )
+  ) {
     info(
       `Pull request #${pullRequest.number} does not have the required label: ${matchLabel}`,
     );
@@ -135,7 +140,9 @@ const handlePullRequest = async (
 const run = async () => {
   try {
     const token = getInput("token", { required: true });
-    const autoMergeRequired = Boolean(getInput("auto_merge_required", { required: false }) ?? true);
+    const autoMergeRequired = Boolean(
+      getInput("auto_merge_required", { required: false }) ?? true,
+    );
     const matchLabel = getInput("match_label", { required: false });
 
     const octokit = getOctokit(token);
@@ -170,7 +177,12 @@ const run = async () => {
     for (const pullRequest of pullRequests) {
       // PRs are handled sequentially to avoid breaking GitHub's log grouping feature.
       // eslint-disable-next-line no-await-in-loop
-      await handlePullRequest(pullRequest, { autoMergeRequired, eventPayload, matchLabel, octokit });
+      await handlePullRequest(pullRequest, {
+        autoMergeRequired,
+        eventPayload,
+        matchLabel,
+        octokit,
+      });
     }
   } catch (error: unknown) {
     setFailed(ensureError(error));
