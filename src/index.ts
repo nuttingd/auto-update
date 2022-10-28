@@ -84,12 +84,23 @@ const handlePullRequest = async (
   {
     eventPayload,
     octokit,
+    autoMergeRequired,
+    matchLabel
   }: Readonly<{
     eventPayload: PushEvent;
     octokit: InstanceType<typeof GitHub>;
+    autoMergeRequired: Boolean;
+    matchLabel: String | null | undefined
   }>,
 ): Promise<void> => {
-  if (!pullRequest.auto_merge) {
+  if (matchLabel && !pullRequest.labels.find((label: { name: String; }) => label.name === matchLabel)){
+    info(
+      `Pull request #${pullRequest.number} does not have the required label: ${matchLabel}`,
+    );
+    return;
+  }
+
+  if (autoMergeRequired && !pullRequest.auto_merge) {
     info(
       `Pull request #${pullRequest.number} does not have auto-merge enabled`,
     );
@@ -123,7 +134,10 @@ const handlePullRequest = async (
 
 const run = async () => {
   try {
-    const token = getInput("github_token", { required: true });
+    const token = getInput("token", { required: true });
+    const autoMergeRequired = getInput("auto_merge_required", { required: false}) ?? true;
+    const matchLabel = getInput("match_label", { required: false});
+
     const octokit = getOctokit(token);
 
     if (context.eventName !== "push") {
@@ -156,7 +170,7 @@ const run = async () => {
     for (const pullRequest of pullRequests) {
       // PRs are handled sequentially to avoid breaking GitHub's log grouping feature.
       // eslint-disable-next-line no-await-in-loop
-      await handlePullRequest(pullRequest, { eventPayload, octokit });
+      await handlePullRequest(pullRequest, { eventPayload, octokit, autoMergeRequired, matchLabel });
     }
   } catch (error: unknown) {
     setFailed(ensureError(error));

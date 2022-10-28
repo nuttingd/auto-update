@@ -2,9 +2,14 @@ name: Auto-update
 author: Thibault Derousseaux <tibdex@gmail.com>
 description: Automatically keep pull requests with auto-merged enabled up to date with their base branch.
 inputs:
-  github_token:
+  token:
     description: Token for the GitHub API.
     default: ${{ github.token }}
+  auto_merge_required:
+    description: Whether to check if Auto-Merge is enabled before updating branch
+    default: ${{ true }}
+  match_label:
+    description: Label to match
 runs:
   using: node16
   main: dist/index.js
