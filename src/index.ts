@@ -135,8 +135,8 @@ const handlePullRequest = async (
 const run = async () => {
   try {
     const token = getInput("token", { required: true });
-    const autoMergeRequired = getInput("auto_merge_required", { required: false}) ?? true;
-    const matchLabel = getInput("match_label", { required: false});
+    const autoMergeRequired = Boolean(getInput("auto_merge_required", { required: false }) ?? true);
+    const matchLabel = getInput("match_label", { required: false });
 
     const octokit = getOctokit(token);
 
